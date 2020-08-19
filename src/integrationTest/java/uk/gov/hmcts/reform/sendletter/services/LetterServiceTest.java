@@ -9,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import uk.gov.hmcts.reform.pdf.generator.HTMLToPDFConverter;
+import uk.gov.hmcts.reform.sendletter.IntegrationSampleData;
 import uk.gov.hmcts.reform.sendletter.PdfHelper;
 import uk.gov.hmcts.reform.sendletter.SampleData;
 import uk.gov.hmcts.reform.sendletter.entity.Letter;
 import uk.gov.hmcts.reform.sendletter.entity.LetterRepository;
 import uk.gov.hmcts.reform.sendletter.model.in.LetterRequest;
+import uk.gov.hmcts.reform.sendletter.model.in.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.services.ftp.ServiceFolderMapping;
 import uk.gov.hmcts.reform.sendletter.services.pdf.DuplexPreparator;
 import uk.gov.hmcts.reform.sendletter.services.pdf.PdfCreator;
@@ -93,7 +95,7 @@ class LetterServiceTest {
     @Test
     void saves_an_new_letter_if_previous_one_has_been_sent_to_print() {
         // given
-        LetterRequest sampleRequest = SampleData.letterRequest();
+        LetterWithPdfsRequest sampleRequest = IntegrationSampleData.letterWithPdfsRequest();
         UUID id1 = service.save(sampleRequest, SERVICE_NAME);
         Letter letter = letterRepository.findById(id1).get();
 
