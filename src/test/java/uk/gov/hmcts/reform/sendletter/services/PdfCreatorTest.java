@@ -8,21 +8,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sendletter.model.in.Doc;
-import uk.gov.hmcts.reform.sendletter.model.in.Document;
 import uk.gov.hmcts.reform.sendletter.services.pdf.DuplexPreparator;
-import uk.gov.hmcts.reform.sendletter.services.pdf.IHtmlToPdfConverter;
 import uk.gov.hmcts.reform.sendletter.services.pdf.PdfCreator;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.List;
 
 import static com.google.common.io.Resources.getResource;
 import static com.google.common.io.Resources.toByteArray;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -33,20 +28,12 @@ import static org.mockito.Mockito.verify;
 class PdfCreatorTest {
 
     @Mock private DuplexPreparator duplexPreparator;
-    @Mock private IHtmlToPdfConverter converter;
 
     private PdfCreator pdfCreator;
 
     @BeforeEach
     void setUp() {
-        pdfCreator = new PdfCreator(this.duplexPreparator, this.converter);
-    }
-
-    @Test
-    void should_require_documents_to_not_be_null() {
-        assertThatThrownBy(() -> pdfCreator.createFromTemplates(null))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessageContaining("documents");
+        pdfCreator = new PdfCreator(this.duplexPreparator);
     }
 
     @Test
@@ -82,16 +69,8 @@ class PdfCreatorTest {
         given(duplexPreparator.prepare(test1Pdf)).willReturn(test1Pdf);
         given(duplexPreparator.prepare(test2Pdf)).willReturn(test2Pdf);
 
-        given(converter.apply(eq("t1".getBytes()), any())).willReturn(test1Pdf);
-        given(converter.apply(eq("t2".getBytes()), any())).willReturn(test2Pdf);
-
-        List<Document> docs = asList(
-            new Document("t1", emptyMap()),
-            new Document("t2", emptyMap())
-        );
-
         // when
-        byte[] pdfContent = pdfCreator.createFromTemplates(docs);
+        byte[] pdfContent = pdfCreator.createFromBase64Pdfs(asList(test1Pdf, test2Pdf));
 
         // then
         try (

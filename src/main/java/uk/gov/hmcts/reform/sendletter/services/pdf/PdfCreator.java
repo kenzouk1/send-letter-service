@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sendletter.services.pdf;
 import org.apache.http.util.Asserts;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sendletter.model.in.Doc;
-import uk.gov.hmcts.reform.sendletter.model.in.Document;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -15,24 +14,9 @@ import static java.util.stream.Collectors.toList;
 public class PdfCreator {
 
     private final DuplexPreparator duplexPreparator;
-    private final IHtmlToPdfConverter converter;
 
-    public PdfCreator(DuplexPreparator duplexPreparator, IHtmlToPdfConverter converter) {
+    public PdfCreator(DuplexPreparator duplexPreparator) {
         this.duplexPreparator = duplexPreparator;
-        this.converter = converter;
-    }
-
-    public byte[] createFromTemplates(List<Document> documents) {
-        Asserts.notNull(documents, "documents");
-
-        List<byte[]> docs =
-            documents
-                .stream()
-                .map(this::generatePdf)
-                .map(duplexPreparator::prepare)
-                .collect(toList());
-
-        return PdfMerger.mergeDocuments(docs);
     }
 
     public byte[] createFromBase64Pdfs(List<byte[]> base64decodedDocs) {
@@ -57,11 +41,5 @@ public class PdfCreator {
             .collect(toList());
 
         return PdfMerger.mergeDocuments(pdfs);
-    }
-
-    private byte[] generatePdf(Document document) {
-        synchronized (PdfCreator.class) {
-            return converter.apply(document.template.getBytes(), document.values);
-        }
     }
 }

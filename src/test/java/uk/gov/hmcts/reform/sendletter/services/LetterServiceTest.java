@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.sendletter.exception.ServiceNotConfiguredException;
 import uk.gov.hmcts.reform.sendletter.exception.UnsupportedLetterRequestTypeException;
 import uk.gov.hmcts.reform.sendletter.model.PdfDoc;
 import uk.gov.hmcts.reform.sendletter.model.in.ILetterRequest;
-import uk.gov.hmcts.reform.sendletter.model.in.LetterRequest;
 import uk.gov.hmcts.reform.sendletter.model.in.LetterWithPdfsAndNumberOfCopiesRequest;
 import uk.gov.hmcts.reform.sendletter.model.in.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.services.encryption.UnableToLoadPgpPublicKeyException;
@@ -47,24 +46,6 @@ class LetterServiceTest {
     private LetterService service;
 
     @Test
-    void should_generate_final_pdf_from_template_when_old_model_is_passed() throws Exception {
-        // given
-        thereAreNoDuplicates();
-
-        // and
-        given(serviceFolderMapping.getFolderFor(any())).willReturn(Optional.of("some_folder"));
-        createLetterService(false, null);
-
-        LetterRequest letter = SampleData.letterRequest();
-
-        // when
-        service.save(letter, "some_service");
-
-        // then
-        verify(pdfCreator).createFromTemplates(letter.documents);
-    }
-
-    @Test
     void should_generate_final_pdf_from_embedded_pdfs_when_new_model_is_passed() throws Exception {
         // given
         thereAreNoDuplicates();
@@ -80,30 +61,6 @@ class LetterServiceTest {
 
         // then
         verify(pdfCreator).createFromBase64Pdfs(letter.documents);
-    }
-
-    @Test
-    void should_generate_final_pdf_from_template_when_old_model_is_passed_and_encryption_enabled()
-        throws Exception {
-        // given
-        thereAreNoDuplicates();
-
-        // and
-        given(serviceFolderMapping.getFolderFor(any())).willReturn(Optional.of("some_folder"));
-        createLetterService(true, new String(loadPublicKey()));
-
-        LetterRequest letter = SampleData.letterRequest();
-
-        byte[] inputZipFile = Resources.toByteArray(getResource("unencrypted.zip"));
-
-        when(zipper.zip(any(PdfDoc.class))).thenReturn(inputZipFile);
-
-        // when
-        service.save(letter, "some_service");
-
-        // then
-        verify(pdfCreator).createFromTemplates(letter.documents);
-        verify(zipper).zip(any(PdfDoc.class));
     }
 
     @Test

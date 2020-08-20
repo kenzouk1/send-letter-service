@@ -3,24 +3,19 @@ package uk.gov.hmcts.reform.sendletter.services.pdf;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sendletter.exception.DuplexException;
-import uk.gov.hmcts.reform.sendletter.services.LetterService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
 @Component
 public class DuplexPreparator {
-    private static final Logger log = LoggerFactory.getLogger(DuplexPreparator.class);
+
     /**
      * Adds an extra blank page if the total number of pages is odd.
      */
     public byte[] prepare(byte[] pdf) {
-        log.info(Arrays.toString(pdf));
         try (PDDocument pdDoc = PDDocument.load(pdf)) {
             if (pdDoc.getNumberOfPages() % 2 == 1) {
                 PDRectangle lastPageMediaBox = pdDoc.getPage(pdDoc.getNumberOfPages() - 1).getMediaBox();

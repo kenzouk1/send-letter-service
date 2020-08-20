@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import uk.gov.hmcts.reform.pdf.generator.HTMLToPDFConverter;
 import uk.gov.hmcts.reform.sendletter.SampleData;
 import uk.gov.hmcts.reform.sendletter.entity.Letter;
 import uk.gov.hmcts.reform.sendletter.entity.LetterRepository;
@@ -57,7 +56,7 @@ class UploadLettersTaskTest {
         when(serviceFolderMapping.getFolderFor(any())).thenReturn(Optional.of(LocalSftpServer.SERVICE_FOLDER));
 
         this.letterService = new LetterService(
-            new PdfCreator(new DuplexPreparator(), new HTMLToPDFConverter()::convert),
+            new PdfCreator(new DuplexPreparator()),
             repository,
             new Zipper(),
             new ObjectMapper(),
@@ -69,7 +68,7 @@ class UploadLettersTaskTest {
 
     @Test
     void uploads_file_to_sftp_and_sets_letter_status_to_uploaded() throws Exception {
-        UUID id = letterService.save(SampleData.letterRequest(), "bulkprint");
+        UUID id = letterService.save(SampleData.letterWithPdfAndCopiesRequest(), "bulkprint");
         UploadLettersTask task = new UploadLettersTask(
             repository,
             FtpHelper.getSuccessfulClient(LocalSftpServer.port),
@@ -99,9 +98,9 @@ class UploadLettersTaskTest {
     @Test
     void should_fail_to_upload_to_sftp_and_stop_from_uploading_any_other_letters() throws Exception {
         // given
-        UUID id = letterService.save(SampleData.letterRequest(), "bulkprint");
+        UUID id = letterService.save(SampleData.letterWithPdfAndCopiesRequest(), "bulkprint");
         // additional letter to verify upload loop broke and zipper was never called again
-        letterService.save(SampleData.letterRequest(), "bulkprint");
+        letterService.save(SampleData.letterWithPdfAndCopiesRequest(), "bulkprint");
 
         // and
         UploadLettersTask task = new UploadLettersTask(
@@ -135,7 +134,7 @@ class UploadLettersTaskTest {
     void should_process_only_one_batch_of_files_in_single_run() throws Exception {
         int letterCount = UploadLettersTask.BATCH_SIZE + 1;
         IntStream.rangeClosed(1, letterCount).forEach(
-            x -> letterService.save(SampleData.letterRequest(), "bulkprint"));
+            x -> letterService.save(SampleData.letterWithPdfsRequest(), "bulkprint"));
 
         UploadLettersTask task = new UploadLettersTask(
             repository,

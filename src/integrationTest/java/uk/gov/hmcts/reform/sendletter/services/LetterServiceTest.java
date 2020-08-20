@@ -8,13 +8,10 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import uk.gov.hmcts.reform.pdf.generator.HTMLToPDFConverter;
 import uk.gov.hmcts.reform.sendletter.IntegrationSampleData;
 import uk.gov.hmcts.reform.sendletter.PdfHelper;
-import uk.gov.hmcts.reform.sendletter.SampleData;
 import uk.gov.hmcts.reform.sendletter.entity.Letter;
 import uk.gov.hmcts.reform.sendletter.entity.LetterRepository;
-import uk.gov.hmcts.reform.sendletter.model.in.LetterRequest;
 import uk.gov.hmcts.reform.sendletter.model.in.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.services.ftp.ServiceFolderMapping;
 import uk.gov.hmcts.reform.sendletter.services.pdf.DuplexPreparator;
@@ -49,7 +46,7 @@ class LetterServiceTest {
         BDDMockito.given(serviceFolderMapping.getFolderFor(any())).willReturn(Optional.of("some_folder_name"));
 
         service = new LetterService(
-            new PdfCreator(new DuplexPreparator(), new HTMLToPDFConverter()::convert),
+            new PdfCreator(new DuplexPreparator()),
             letterRepository,
             new Zipper(),
             new ObjectMapper(),
@@ -66,7 +63,7 @@ class LetterServiceTest {
 
     @Test
     void generates_and_saves_zipped_pdf() throws IOException {
-        UUID id = service.save(SampleData.letterRequest(), SERVICE_NAME);
+        UUID id = service.save(IntegrationSampleData.letterWithPdfsRequest(), SERVICE_NAME);
 
         Letter result = letterRepository.findById(id).get();
 
@@ -78,7 +75,7 @@ class LetterServiceTest {
     @Test
     void returns_same_id_on_resubmit() {
         // given
-        LetterRequest sampleRequest = SampleData.letterRequest();
+        LetterWithPdfsRequest sampleRequest = IntegrationSampleData.letterWithPdfsRequest();
         UUID id1 = service.save(sampleRequest, SERVICE_NAME);
         Letter letter = letterRepository.findById(id1).get();
 
@@ -113,13 +110,13 @@ class LetterServiceTest {
 
     @Test
     void should_not_allow_null_service_name() {
-        assertThatThrownBy(() -> service.save(SampleData.letterRequest(), null))
+        assertThatThrownBy(() -> service.save(IntegrationSampleData.letterWithPdfsRequest(), null))
             .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
     void should_not_allow_empty_service_name() {
-        assertThatThrownBy(() -> service.save(SampleData.letterRequest(), ""))
+        assertThatThrownBy(() -> service.save(IntegrationSampleData.letterWithPdfsRequest(), ""))
             .isInstanceOf(IllegalStateException.class);
     }
 

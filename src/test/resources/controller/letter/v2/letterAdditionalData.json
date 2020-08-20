@@ -1,0 +1,10 @@
+{
+  "documents": [
+    "aGVsbG8=",
+    "d29ybGQ="
+  ],
+  "type": "typeA",
+  "additional_data" : {
+    "doc_type":"my doc type","caseId":"123"
+  }
+}

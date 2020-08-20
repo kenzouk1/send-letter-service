@@ -4,8 +4,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,11 +22,9 @@ import uk.gov.hmcts.reform.sendletter.model.out.SendLetterResponse;
 import uk.gov.hmcts.reform.sendletter.services.AuthService;
 import uk.gov.hmcts.reform.sendletter.services.LetterService;
 
-import java.util.Arrays;
 import java.util.UUID;
 import javax.validation.Valid;
 
-import static org.slf4j.LoggerFactory.*;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -38,7 +34,6 @@ import static org.springframework.http.ResponseEntity.ok;
     produces = {MediaType.APPLICATION_JSON_VALUE}
 )
 public class SendLetterController {
-    Logger log = getLogger(SendLetterController.class);
 
     private final LetterService letterService;
     private final AuthService authService;
@@ -63,8 +58,6 @@ public class SendLetterController {
         @ApiParam(value = "Letter consisting of documents and type", required = true)
         @Valid @RequestBody LetterWithPdfsRequest letter
     ) {
-        log.info(Arrays.toString(letter.documents.get(0)));
-        log.info(new String(letter.documents.get(0)));
         String serviceName = authService.authenticate(serviceAuthHeader);
         UUID letterId = letterService.save(letter, serviceName);
 

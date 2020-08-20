@@ -8,11 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import uk.gov.hmcts.reform.pdf.generator.HTMLToPDFConverter;
-import uk.gov.hmcts.reform.sendletter.SampleData;
+import uk.gov.hmcts.reform.sendletter.IntegrationSampleData;
 import uk.gov.hmcts.reform.sendletter.entity.Letter;
 import uk.gov.hmcts.reform.sendletter.entity.LetterRepository;
-import uk.gov.hmcts.reform.sendletter.model.in.LetterRequest;
+import uk.gov.hmcts.reform.sendletter.model.in.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.services.encryption.PgpDecryptionHelper;
 import uk.gov.hmcts.reform.sendletter.services.ftp.ServiceFolderMapping;
 import uk.gov.hmcts.reform.sendletter.services.pdf.DuplexPreparator;
@@ -51,9 +50,9 @@ class LetterServiceWithEncryptionEnabledTest {
     void generates_and_saves_encrypted_zip_when_encryption_is_enabled() throws Exception {
         when(serviceFolderMapping.getFolderFor(any())).thenReturn(Optional.of("some_folder"));
 
-        LetterRequest letterRequest = SampleData.letterRequest();
+        LetterWithPdfsRequest letterRequest = IntegrationSampleData.letterWithPdfsRequest();
 
-        PdfCreator pdfCreator = new PdfCreator(new DuplexPreparator(), new HTMLToPDFConverter()::convert);
+        PdfCreator pdfCreator = new PdfCreator(new DuplexPreparator());
 
         LetterService service = new LetterService(
             pdfCreator,

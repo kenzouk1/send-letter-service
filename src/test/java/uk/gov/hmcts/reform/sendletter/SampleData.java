@@ -1,14 +1,10 @@
 package uk.gov.hmcts.reform.sendletter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.common.io.Resources;
 import uk.gov.hmcts.reform.sendletter.model.LetterPrintStatus;
 import uk.gov.hmcts.reform.sendletter.model.ParsedReport;
 import uk.gov.hmcts.reform.sendletter.model.in.Doc;
-import uk.gov.hmcts.reform.sendletter.model.in.Document;
-import uk.gov.hmcts.reform.sendletter.model.in.LetterRequest;
 import uk.gov.hmcts.reform.sendletter.model.in.LetterWithPdfsAndNumberOfCopiesRequest;
 import uk.gov.hmcts.reform.sendletter.model.in.LetterWithPdfsRequest;
 
@@ -19,34 +15,12 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
-import static com.google.common.io.Resources.getResource;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.LocalDateTime.now;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 public final class SampleData {
-
-    public static LetterRequest letterRequest() {
-        try {
-            return new LetterRequest(
-                singletonList(
-                    new Document(
-                        Resources.toString(getResource("template.html"), UTF_8),
-                        ImmutableMap.of(
-                            "name", "John",
-                            "reference", UUID.randomUUID()
-                        )
-                    )
-                ),
-                "someType",
-                Maps.newHashMap()
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public static LetterWithPdfsRequest letterWithPdfsRequest() {
         return new LetterWithPdfsRequest(

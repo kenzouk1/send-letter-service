@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.sendletter.exception.ServiceNotConfiguredException;
 import uk.gov.hmcts.reform.sendletter.exception.UnsupportedLetterRequestTypeException;
 import uk.gov.hmcts.reform.sendletter.model.PdfDoc;
 import uk.gov.hmcts.reform.sendletter.model.in.ILetterRequest;
-import uk.gov.hmcts.reform.sendletter.model.in.LetterRequest;
 import uk.gov.hmcts.reform.sendletter.model.in.LetterWithPdfsAndNumberOfCopiesRequest;
 import uk.gov.hmcts.reform.sendletter.model.in.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.model.out.LetterStatus;
@@ -156,9 +155,7 @@ public class LetterService {
     }
 
     private byte[] getPdfContent(ILetterRequest letter) {
-        if (letter instanceof LetterRequest) {
-            return pdfCreator.createFromTemplates(((LetterRequest) letter).documents);
-        } else if (letter instanceof LetterWithPdfsRequest) {
+        if (letter instanceof LetterWithPdfsRequest) {
             return pdfCreator.createFromBase64Pdfs(((LetterWithPdfsRequest) letter).documents);
         } else if (letter instanceof LetterWithPdfsAndNumberOfCopiesRequest) {
             return pdfCreator
