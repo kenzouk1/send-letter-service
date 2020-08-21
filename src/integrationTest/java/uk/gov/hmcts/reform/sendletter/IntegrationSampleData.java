@@ -8,8 +8,10 @@ import uk.gov.hmcts.reform.sendletter.model.in.LetterWithPdfsRequest;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.UUID;
 
 import static java.util.Collections.singletonList;
 
@@ -39,7 +41,7 @@ public final class IntegrationSampleData {
                         Base64.getDecoder().decode(appProps.getProperty(ENCODED_PDF_BYTES))
                 ),
                 "someType",
-                Maps.newHashMap()
+                Map.of("reference", UUID.randomUUID())
         );
     }
 }

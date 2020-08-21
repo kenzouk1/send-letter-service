@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import uk.gov.hmcts.reform.sendletter.IntegrationSampleData;
 import uk.gov.hmcts.reform.sendletter.SampleData;
 import uk.gov.hmcts.reform.sendletter.entity.Letter;
 import uk.gov.hmcts.reform.sendletter.entity.LetterRepository;
@@ -134,7 +135,7 @@ class UploadLettersTaskTest {
     void should_process_only_one_batch_of_files_in_single_run() throws Exception {
         int letterCount = UploadLettersTask.BATCH_SIZE + 1;
         IntStream.rangeClosed(1, letterCount).forEach(
-            x -> letterService.save(SampleData.letterWithPdfsRequest(), "bulkprint"));
+            x -> letterService.save(IntegrationSampleData.letterWithPdfsRequest(), "bulkprint"));
 
         UploadLettersTask task = new UploadLettersTask(
             repository,
