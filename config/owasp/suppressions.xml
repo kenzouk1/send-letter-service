@@ -105,4 +105,9 @@
         <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
         <cve>CVE-2020-11023</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[file name: spring-core-5.2.8.RELEASE.jar]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-core@.*$</packageUrl>
+        <vulnerabilityName>CVE-2020-5421</vulnerabilityName>
+    </suppress>
 </suppressions>
