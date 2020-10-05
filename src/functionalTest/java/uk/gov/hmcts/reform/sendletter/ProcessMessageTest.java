@@ -78,6 +78,24 @@ class ProcessMessageTest extends FunctionalTestSuite {
         });
     }
 
+    @Test
+    void should_throw_ConflictException()  {
+        executeMutiReques(this::getLetterRequest);
+    }
+
+    private String getLetterRequest() {
+        String letterId = "none";
+        try {
+            letterId = sendPrintLetterRequest(
+                    signIn(),
+                    sampleLetterRequestJson("letter_single_document.json", "two-page-template.html")
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return letterId;
+    }
+
     @Override
     String getContentType() {
         return MediaTypes.LETTER_V1;

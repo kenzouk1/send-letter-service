@@ -26,6 +26,25 @@ public class ProcessMessageWithDocumentCountTest extends FunctionalTestSuite {
         });
     }
 
+    @Test
+    void should_throw_ConflictException()  {
+        executeMutiReques(this::getLetterRequest);
+    }
+
+    private String getLetterRequest() {
+        String letterId = "none";
+        try {
+            letterId = sendPrintLetterRequest(
+                    signIn(),
+                    samplePdfLetterRequestJson("letter-with-document-count.json", "test.pdf")
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return letterId;
+    }
+
+
     @Override
     String getContentType() {
         return MediaTypes.LETTER_V3;

@@ -5,6 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sendletter.controllers.MediaTypes;
 
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -24,6 +26,24 @@ class ProcessMessageTestForPdfEndpoint extends FunctionalTestSuite {
                 validatePdfFile(letterId, sftp, sftpFile, 2);
             }
         });
+    }
+
+    @Test
+    void should_throw_ConflictException()  {
+        executeMutiReques(this::getLetterRequest);
+    }
+
+    private String getLetterRequest() {
+        String letterId = "none";
+        try {
+            letterId =  sendPrintLetterRequest(
+                    signIn(),
+                    samplePdfLetterRequestJson("letter-with-single-pdf.json", "test.pdf")
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return letterId;
     }
 
     @Test

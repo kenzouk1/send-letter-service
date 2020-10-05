@@ -30,8 +30,9 @@ class LetterTest {
 
     @Test
     void should_db_exception_save() {
-        repository.save(SampleData.letterEntity("a.service"));
-        repository.save(SampleData.letterEntity("a.service"));
+        repository.save(SampleData.letterEntity("a.service", () -> "checkSum"));
+        repository.save(SampleData.letterEntity("a.service",() -> "checkSum"));
+
         DataIntegrityViolationException violationException = assertThrows(DataIntegrityViolationException.class,
             () -> Lists.newArrayList(repository.findAll()));
         assertThat(violationException.getMessage()).contains("ConstraintViolationException");

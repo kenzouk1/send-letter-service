@@ -26,8 +26,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -37,6 +42,7 @@ import static org.apache.commons.lang.time.DateUtils.addSeconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.util.DateUtil.now;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -279,6 +285,19 @@ abstract class FunctionalTestSuite {
         } else {
             return matchingFiles.stream().findFirst();
         }
+    }
+
+    void executeMutiReques(Supplier<String> letterRequest) {
+        List<CompletableFuture<String>> letters = IntStream.rangeClosed(0, 1)
+                .mapToObj(i -> invokeAsyncSendLetter(letterRequest)).collect(Collectors.toList());
+        CompletionException completionException =
+                assertThrows(CompletionException.class, () -> letters.stream()
+                        .map(CompletableFuture::join).forEach(System.out::println));
+        assertThat(completionException.getMessage()).contains("Expected status code <200> but was <409>");
+    }
+
+    private CompletableFuture<String> invokeAsyncSendLetter(Supplier<String> letterRequest) {
+        return CompletableFuture.supplyAsync(letterRequest);
     }
 
     void validatePdfFile(

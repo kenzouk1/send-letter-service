@@ -36,7 +36,7 @@ public class PendingLetterSearchTest {
 
         // then
         assertThat(letters)
-            .extracting(l -> l.getType())
+            .extracting(BasicLetterInfo::getType)
             .containsExactly("type-3", "type-4");
     }
 
@@ -58,7 +58,8 @@ public class PendingLetterSearchTest {
     @Test
     public void should_set_properties_correctly() {
         // given
-        Letter letter = SampleData.letterEntity("service", LocalDateTime.now(), "type", "fingerprint", 1);
+        Letter letter = SampleData.letterEntity("service", LocalDateTime.now(), "type", "fingerprint", 1,
+                SampleData.checkSumSupplier);
         letter.setStatus(Created);
         Letter savedLetter = repository.save(letter);
 
@@ -84,6 +85,8 @@ public class PendingLetterSearchTest {
                 savedLetter.getType()
             ));
     }
+
+
 
     private void storeLetter(LetterStatus status, String type) {
         Letter letter = SampleData.letterEntity("service1", LocalDateTime.now(), type);
