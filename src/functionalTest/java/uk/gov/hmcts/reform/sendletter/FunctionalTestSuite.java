@@ -287,7 +287,7 @@ abstract class FunctionalTestSuite {
         }
     }
 
-    void executeMutiReques(Supplier<String> letterRequest) {
+    void executeMultiRequest(Supplier<String> letterRequest) {
         List<CompletableFuture<String>> letters = IntStream.rangeClosed(0, 1)
                 .mapToObj(i -> invokeAsyncSendLetter(letterRequest)).collect(Collectors.toList());
         CompletionException completionException =

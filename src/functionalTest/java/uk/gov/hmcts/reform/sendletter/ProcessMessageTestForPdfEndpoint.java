@@ -30,7 +30,7 @@ class ProcessMessageTestForPdfEndpoint extends FunctionalTestSuite {
 
     @Test
     void should_throw_ConflictException()  {
-        executeMutiReques(this::getLetterRequest);
+        executeMultiRequest(this::getLetterRequest);
     }
 
     private String getLetterRequest() {
