@@ -61,28 +61,6 @@ class ProcessMessageTest extends FunctionalTestSuite {
         });
     }
 
-    @Test
-    void should_send_letter_and_upload_file_on_sftp_server_when_letter_contains_two_documents_with_odd_pages()
-        throws Exception {
-        String letterId = sendPrintLetterRequest(
-            signIn(),
-            sampleLetterRequestJson("letter_two_documents.json", "one-page-template.html")
-        );
-
-        awaitAndVerifyFileOnSftp(letterId, (sftpFile, sftp) -> {
-            assertThat(sftpFile.getName()).matches(getFileNamePattern(letterId));
-
-            if (!isEncryptionEnabled) {
-                validatePdfFile(letterId, sftp, sftpFile, 4);
-            }
-        });
-    }
-
-    @Test
-    void should_throw_ConflictException()  {
-        executeMutiReques(this::getLetterRequest);
-    }
-
     private String getLetterRequest() {
         String letterId = "none";
         try {
