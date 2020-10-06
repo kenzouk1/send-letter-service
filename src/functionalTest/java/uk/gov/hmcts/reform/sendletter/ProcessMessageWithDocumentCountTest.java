@@ -36,7 +36,7 @@ public class ProcessMessageWithDocumentCountTest extends FunctionalTestSuite {
         try {
             letterId = sendPrintLetterRequest(
                     signIn(),
-                    samplePdfLetterRequestJson("letter-with-document-count.json", "test.pdf")
+                    samplePdfLetterRequestJson("letter-with-document-count_3.json", "test.pdf")
             );
         } catch (Exception e) {
             e.printStackTrace();
