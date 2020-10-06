@@ -90,7 +90,7 @@ class ProcessMessageTest extends FunctionalTestSuite {
         try {
             letterId =  sendPrintLetterRequest(
                     signIn(),
-                    samplePdfLetterRequestJson("letter_single_document.json", "one-page-template_duplicate")
+                    samplePdfLetterRequestJson("letter_single_document.json", "one-page-template_duplicate.html")
             );
         } catch (IOException e) {
             e.printStackTrace();
