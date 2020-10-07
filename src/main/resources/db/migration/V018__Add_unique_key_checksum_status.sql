@@ -5,10 +5,6 @@ from letters) duplicate
 where duplicate.counter > 1) updateQuery
 where let.id = updateQuery.id;
 
-alter table letters
-add column instances int
-default 0;
 
-alter table letters
-add constraint checksum_status unique (checksum, status, instances)
-
+CREATE UNIQUE INDEX checksum_status ON letters (checksum, status)
+    WHERE status = 'Created';
