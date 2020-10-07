@@ -1,9 +1,10 @@
-update letters let set checksum = updateQuery.checksum from
-(select counter, checksum || counter checksum, status, id from (
-select row_number() over (partition by checksum, status) counter, checksum, status, id
-from letters) duplicate
-where duplicate.counter > 1) updateQuery
-where let.id = updateQuery.id;
+UPDATE letters let SET checksum = updateQuery.checksum FROM
+(SELECT counter, checksum || counter checksum, status, id FROM (
+SELECT row_number() over (PARTITION BY checksum, status) counter, checksum, status, id
+FROM letters
+WHERE status = 'Created') duplicate
+WHERE duplicate.counter > 1) updateQuery
+WHERE let.id = updateQuery.id;
 
 
 CREATE UNIQUE INDEX checksum_status ON letters (checksum, status)
