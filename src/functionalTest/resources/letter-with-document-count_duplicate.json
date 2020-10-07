@@ -2,15 +2,15 @@
   "documents": [
     {
       "content": "{{pdf}}",
-      "copies": 1
+      "copies": 10
     },
     {
       "content": "{{pdf}}",
-      "copies": 1
+      "copies": 10
     },
     {
       "content": "{{pdf}}",
-      "copies": 1
+      "copies": 10
     }
   ],
   "type": "BPS001"
