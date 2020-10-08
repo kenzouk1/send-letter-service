@@ -108,8 +108,8 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Void> handleDataIntegrityViolationException(final DataIntegrityViolationException dve) {
+    public ResponseEntity<String> handleDataIntegrityViolationException(final DataIntegrityViolationException dve) {
         log.error(dve.getMessage(), dve);
-        return status(CONFLICT).build();
+        return status(CONFLICT).body("Duplicate request");
     }
 }
