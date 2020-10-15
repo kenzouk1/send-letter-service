@@ -84,7 +84,7 @@ abstract class FunctionalTestSuite {
     @Value("${encryption.enabled}")
     Boolean isEncryptionEnabled;
 
-    static final int LETTER_STATUS_RETRY_COUNT = 40;
+    static final int LETTER_STATUS_RETRY_COUNT = 5;
     static final int LETTER_STATUS_RETRY_INTERVAL = 500;
     
     /**
@@ -147,7 +147,7 @@ abstract class FunctionalTestSuite {
                 .relaxedHTTPSValidation()
                 .baseUri(sendLetterServiceUrl)
                 .when()
-                .get("/letters/{id}", letterId)
+                .get("/letters/{id}?check-duplicate=true", letterId)
                 .then()
                 .statusCode(200)
                 .extract()
@@ -293,6 +293,7 @@ abstract class FunctionalTestSuite {
         CompletionException completionException =
                 assertThrows(CompletionException.class, () -> letters.stream()
                         .map(CompletableFuture::join).forEach(System.out::println));
+        System.out.println("completionException is " + completionException.getMessage());
         assertThat(completionException.getMessage()).contains("Expected status code <200> but was <409>");
     }
 
