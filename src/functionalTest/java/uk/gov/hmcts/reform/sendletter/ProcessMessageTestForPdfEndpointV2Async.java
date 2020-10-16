@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.sendletter.entity.LetterStatus;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
 
 @ExtendWith(SpringExtension.class)
 class ProcessMessageTestForPdfEndpointV2Async extends FunctionalTestSuite {
@@ -68,10 +67,9 @@ class ProcessMessageTestForPdfEndpointV2Async extends FunctionalTestSuite {
                     samplePdfLetterRequestJson("letter-with-twenty-pdfs.json", "test.pdf")
             );
             String letterStatus = verifyLetterCreated(letterId);
-            logger.info("Letter id {} , status {} ",  letterId , letterStatus);
+            logger.info("Letter id {} , status {} ",  letterId, letterStatus);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
-
         }
         return letterId;
 

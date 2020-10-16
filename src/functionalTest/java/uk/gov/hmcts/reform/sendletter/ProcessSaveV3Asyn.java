@@ -69,7 +69,7 @@ public class ProcessSaveV3Asyn extends FunctionalTestSuite {
                     samplePdfLetterRequestJson("letter-with-document-count_duplicate_async.json", "test.pdf")
             );
             String letterStatus = verifyLetterCreated(letterId);
-            logger.info("Letter id {} , status {} ",  letterId , letterStatus);
+            logger.info("Letter id {} , status {} ",  letterId, letterStatus);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
