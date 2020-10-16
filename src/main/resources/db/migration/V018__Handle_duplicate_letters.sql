@@ -30,6 +30,3 @@ from (
     WHERE status = 'Created') as duplicatRecords
 WHERE duplicatRecords.counter> 1 );
 
-CREATE UNIQUE INDEX CONCURRENTLY CHECKSUM_STATUS  IF NOT EXISTS ON LETTERS (checksum, status)
-    WHERE status = 'Created';
-
