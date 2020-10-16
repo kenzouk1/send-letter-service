@@ -41,15 +41,14 @@ public class ProcessSaveV3Asyn extends FunctionalTestSuite {
                 logger.info("Retrieving letter id {} and retry count {} ", letterId, counter++);
                 letterStatus = getLetterStatus(letterId);
             } catch (AssertionError e) {
-                System.out.println("Retry error " + e.getMessage());
+                logger.info("Retry error " + e.getMessage());
                 if (e.getMessage().contains("409")) {
                     throw e;
                 }
-                e.printStackTrace();
                 try {
                     Thread.sleep(LETTER_STATUS_RETRY_INTERVAL);
                 } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
+                    logger.error(interruptedException.getMessage(), interruptedException);
                 }
             }
         }
@@ -70,9 +69,9 @@ public class ProcessSaveV3Asyn extends FunctionalTestSuite {
                     samplePdfLetterRequestJson("letter-with-document-count_duplicate_async.json", "test.pdf")
             );
             String letterStatus = verifyLetterCreated(letterId);
-            System.out.println("Letter id " + letterId + ", status " + letterStatus);
+            logger.info("Letter id {} , status {} ",  letterId , letterStatus);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return letterId;
 

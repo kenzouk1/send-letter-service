@@ -14,6 +14,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestPropertySource;
 
@@ -48,6 +50,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @TestPropertySource("classpath:application.properties")
 abstract class FunctionalTestSuite {
+    private static Logger logger = LoggerFactory.getLogger(ProcessSaveV3Asyn.class);
+
     @Value("${s2s-url}")
     private String s2sUrl;
 
@@ -292,8 +296,8 @@ abstract class FunctionalTestSuite {
                 .mapToObj(i -> invokeAsyncSendLetter(letterRequest)).collect(Collectors.toList());
         CompletionException completionException =
                 assertThrows(CompletionException.class, () -> letters.stream()
-                        .map(CompletableFuture::join).forEach(System.out::println));
-        System.out.println("completionException is " + completionException.getMessage());
+                        .map(CompletableFuture::join).forEach(logger::info));
+        logger.info("completionException is {} ", completionException.getMessage());
         assertThat(completionException.getMessage()).contains("Expected status code <200> but was <409>");
     }
 

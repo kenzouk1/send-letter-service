@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sendletter.entity.LetterStatus;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 
 @ExtendWith(SpringExtension.class)
 class ProcessMessageTestForPdfEndpointV2Async extends FunctionalTestSuite {
@@ -40,15 +41,14 @@ class ProcessMessageTestForPdfEndpointV2Async extends FunctionalTestSuite {
                 logger.info("Retrieving letter id {} and retry count {} ", letterId, counter++);
                 letterStatus = getLetterStatus(letterId);
             } catch (AssertionError e) {
-                System.out.println("Retry error " + e.getMessage());
+                logger.info("Retry error " + e.getMessage());
                 if (e.getMessage().contains("409")) {
                     throw e;
                 }
-                e.printStackTrace();
                 try {
                     Thread.sleep(LETTER_STATUS_RETRY_INTERVAL);
                 } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
+                    logger.error(interruptedException.getMessage(), interruptedException);
                 }
             }
         }
@@ -68,9 +68,10 @@ class ProcessMessageTestForPdfEndpointV2Async extends FunctionalTestSuite {
                     samplePdfLetterRequestJson("letter-with-twenty-pdfs.json", "test.pdf")
             );
             String letterStatus = verifyLetterCreated(letterId);
-            System.out.println("Letter id " + letterId + ", status " + letterStatus);
+            logger.info("Letter id {} , status {} ",  letterId , letterStatus);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+
         }
         return letterId;
 
