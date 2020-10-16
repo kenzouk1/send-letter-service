@@ -54,7 +54,7 @@ class InfoTest {
         insert(LetterStatus.Posted);
 
         mvc.perform(get("/info"))
-            .andExpect(jsonPath("$.letters_by_status.created", is(1)))
+            .andExpect(jsonPath("$.letters_by_status.created", is(4)))
             .andExpect(jsonPath("$.letters_by_status.posted", is(2)))
             .andExpect(jsonPath("$.letters_by_status.uploaded", is(0)));
     }
