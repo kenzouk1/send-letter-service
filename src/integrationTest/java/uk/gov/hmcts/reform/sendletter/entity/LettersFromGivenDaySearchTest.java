@@ -1,13 +1,11 @@
 package uk.gov.hmcts.reform.sendletter.entity;
 
-import com.microsoft.applicationinsights.web.internal.WebRequestTrackingFilter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.mock.web.MockFilterConfig;
 import uk.gov.hmcts.reform.sendletter.SampleData;
 
 import java.time.LocalDate;
@@ -16,7 +14,6 @@ import java.util.List;
 
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static uk.gov.hmcts.reform.sendletter.entity.LetterStatus.Posted;
 import static uk.gov.hmcts.reform.sendletter.entity.LetterStatus.Uploaded;
 
