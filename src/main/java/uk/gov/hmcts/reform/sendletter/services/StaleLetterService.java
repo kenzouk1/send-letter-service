@@ -5,7 +5,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sendletter.entity.BasicLetterInfo;
 import uk.gov.hmcts.reform.sendletter.entity.LetterRepository;
 import uk.gov.hmcts.reform.sendletter.services.date.DateCalculator;
+import uk.gov.hmcts.reform.sendletter.util.CsvWriter;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -78,5 +81,10 @@ public class StaleLetterService {
             todayWithFtpDowntimeAdjustedTime,
             minStaleLetterAgeInBusinessDays
         );
+    }
+
+    public File getDownloadFile() throws IOException {
+        List<BasicLetterInfo> staleLetters = getStaleLetters();
+        return CsvWriter.writeStaleLettersToCsv(staleLetters);
     }
 }
