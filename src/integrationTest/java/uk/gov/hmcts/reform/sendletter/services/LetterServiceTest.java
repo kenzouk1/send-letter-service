@@ -14,6 +14,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import uk.gov.hmcts.reform.pdf.generator.HTMLToPDFConverter;
 import uk.gov.hmcts.reform.sendletter.PdfHelper;
 import uk.gov.hmcts.reform.sendletter.SampleData;
+import uk.gov.hmcts.reform.sendletter.entity.DuplicateLetter;
+import uk.gov.hmcts.reform.sendletter.entity.ExceptionLetter;
 import uk.gov.hmcts.reform.sendletter.entity.Letter;
 import uk.gov.hmcts.reform.sendletter.entity.LetterRepository;
 import uk.gov.hmcts.reform.sendletter.model.in.LetterRequest;
@@ -30,7 +32,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -45,15 +49,19 @@ class LetterServiceTest {
 
     private LetterService service;
     private ObjectMapper objectMapper;
-    private AsyncService asyncService;
+    private ExecusionService execusionService;
+    private DuplicateLetterService duplicateLetterService;
+    private ExceptionLetterService exceptionLetterService;
 
     @Autowired
     private LetterRepository letterRepository;
 
     @BeforeEach
     void setUp() {
-        asyncService = spy(AsyncService.class);
+        execusionService = spy(ExecusionService.class);
         ServiceFolderMapping serviceFolderMapping = mock(ServiceFolderMapping.class);
+        duplicateLetterService = mock(DuplicateLetterService.class);
+        exceptionLetterService = mock(ExceptionLetterService.class);
         BDDMockito.given(serviceFolderMapping.getFolderFor(any())).willReturn(Optional.of("some_folder_name"));
         objectMapper = new ObjectMapper();
         service = new LetterService(
@@ -64,8 +72,9 @@ class LetterServiceTest {
             false,
             null,
             serviceFolderMapping,
-            asyncService
-        );
+            execusionService,
+            duplicateLetterService,
+            exceptionLetterService);
     }
 
     @AfterEach
@@ -84,8 +93,10 @@ class LetterServiceTest {
         assertThat(result.getEncryptionKeyFingerprint()).isNull();
         PdfHelper.validateZippedPdf(result.getFileContent());
         if (Boolean.parseBoolean(async)) {
-            verify(asyncService).run(any());
+            verify(execusionService).run(any(), any(), any(), any());
         }
+        verify(duplicateLetterService, never()).save(isA(DuplicateLetter.class));
+        verify(exceptionLetterService, never()).save(isA(ExceptionLetter.class));
     }
 
     @ParameterizedTest
@@ -100,6 +111,9 @@ class LetterServiceTest {
         assertThat(result.isEncrypted()).isFalse();
         assertThat(result.getEncryptionKeyFingerprint()).isNull();
         PdfHelper.validateZippedPdf(result.getFileContent());
+        verify(duplicateLetterService, never()).save(isA(DuplicateLetter.class));
+        verify(exceptionLetterService, never()).save(isA(ExceptionLetter.class));
+
     }
 
     @ParameterizedTest
@@ -118,8 +132,11 @@ class LetterServiceTest {
         assertThat(result.getAdditionalData()).isEqualTo(expectedAdditionalData);
 
         if (Boolean.parseBoolean(async)) {
-            verify(asyncService).run(any());
+            verify(execusionService).run(any(), any(), any(), any());
         }
+        verify(duplicateLetterService, never()).save(isA(DuplicateLetter.class));
+        verify(exceptionLetterService, never()).save(isA(ExceptionLetter.class));
+
     }
 
     @ParameterizedTest
@@ -135,8 +152,11 @@ class LetterServiceTest {
         PdfHelper.validateZippedPdf(result.getFileContent());
 
         if (Boolean.parseBoolean(async)) {
-            verify(asyncService).run(any());
+            verify(execusionService).run(any(), any(), any(), any());
         }
+        verify(duplicateLetterService, never()).save(isA(DuplicateLetter.class));
+        verify(exceptionLetterService, never()).save(isA(ExceptionLetter.class));
+
     }
 
     @ParameterizedTest
@@ -157,8 +177,11 @@ class LetterServiceTest {
         assertThat(id1).isEqualByComparingTo(id2);
 
         if (Boolean.parseBoolean(async)) {
-            verify(asyncService).run(any());
+            verify(execusionService).run(any(), any(), any(), any());
         }
+        verify(duplicateLetterService, never()).save(isA(DuplicateLetter.class));
+        verify(exceptionLetterService, never()).save(isA(ExceptionLetter.class));
+
     }
 
     @ParameterizedTest
@@ -181,8 +204,11 @@ class LetterServiceTest {
         assertThat(id1).isNotEqualByComparingTo(id2);
 
         if (Boolean.parseBoolean(async)) {
-            verify(asyncService, times(2)).run(any());
+            verify(execusionService, times(2)).run(any(), any(), any(), any());
         }
+        verify(duplicateLetterService, never()).save(isA(DuplicateLetter.class));
+        verify(exceptionLetterService, never()).save(isA(ExceptionLetter.class));
+
     }
 
     @ParameterizedTest

@@ -15,7 +15,9 @@ import uk.gov.hmcts.reform.sendletter.entity.LetterRepository;
 import uk.gov.hmcts.reform.sendletter.entity.LetterStatus;
 import uk.gov.hmcts.reform.sendletter.exception.FtpException;
 import uk.gov.hmcts.reform.sendletter.helper.FtpHelper;
-import uk.gov.hmcts.reform.sendletter.services.AsyncService;
+import uk.gov.hmcts.reform.sendletter.services.DuplicateLetterService;
+import uk.gov.hmcts.reform.sendletter.services.ExceptionLetterService;
+import uk.gov.hmcts.reform.sendletter.services.ExecusionService;
 import uk.gov.hmcts.reform.sendletter.services.LetterService;
 import uk.gov.hmcts.reform.sendletter.services.LocalSftpServer;
 import uk.gov.hmcts.reform.sendletter.services.ftp.FtpAvailabilityChecker;
@@ -34,6 +36,7 @@ import javax.persistence.EntityManager;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -57,8 +60,11 @@ class UploadLettersTaskTest {
     void setUp() {
         when(availabilityChecker.isFtpAvailable(any(LocalTime.class))).thenReturn(true);
         when(serviceFolderMapping.getFolderFor(any())).thenReturn(Optional.of(LocalSftpServer.SERVICE_FOLDER));
-        AsyncService asyncService = new AsyncService();
-        
+        ExecusionService execusionService = new ExecusionService();
+        DuplicateLetterService duplicateLetterService = mock(DuplicateLetterService.class);
+        ExceptionLetterService exceptionLetterService = mock(ExceptionLetterService.class);
+
+        repository.deleteAll();
         this.letterService = new LetterService(
             new PdfCreator(new DuplexPreparator(), new HTMLToPDFConverter()::convert),
             repository,
@@ -67,8 +73,9 @@ class UploadLettersTaskTest {
             false,
             null,
             serviceFolderMapping,
-            asyncService
-        );
+            execusionService,
+            duplicateLetterService,
+            exceptionLetterService);
     }
 
     @ParameterizedTest
@@ -79,7 +86,8 @@ class UploadLettersTaskTest {
             repository,
             FtpHelper.getSuccessfulClient(LocalSftpServer.port),
             availabilityChecker,
-            serviceFolderMapping
+            serviceFolderMapping,
+                0
         );
 
         // Invoke the upload job.
@@ -114,7 +122,8 @@ class UploadLettersTaskTest {
             repository,
             FtpHelper.getFailingClient(LocalSftpServer.port),
             availabilityChecker,
-            serviceFolderMapping
+            serviceFolderMapping,
+                0
         );
 
         // and
@@ -148,7 +157,8 @@ class UploadLettersTaskTest {
             repository,
             FtpHelper.getSuccessfulClient(LocalSftpServer.port),
             availabilityChecker,
-            serviceFolderMapping
+            serviceFolderMapping,
+                0
         );
 
         try (LocalSftpServer server = LocalSftpServer.create()) {

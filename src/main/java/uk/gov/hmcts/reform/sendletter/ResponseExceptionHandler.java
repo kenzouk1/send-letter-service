@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sendletter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
 import uk.gov.hmcts.reform.sendletter.exception.DuplexException;
 import uk.gov.hmcts.reform.sendletter.exception.LetterNotFoundException;
+import uk.gov.hmcts.reform.sendletter.exception.LetterSaveException;
 import uk.gov.hmcts.reform.sendletter.exception.ServiceNotConfiguredException;
 import uk.gov.hmcts.reform.sendletter.exception.UnauthenticatedException;
 import uk.gov.hmcts.reform.sendletter.model.out.errors.FieldError;
@@ -25,6 +27,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -81,7 +84,7 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
         return status(BAD_REQUEST).body("Exception occurred while parsing letter contents");
     }
 
-    @ExceptionHandler(DuplexException.class)
+    @ExceptionHandler({DuplexException.class, LetterSaveException.class})
     protected ResponseEntity<String> handleInvalidPdfException() {
         // only then pdf is actually checked hence invalid pdf message
         return status(BAD_REQUEST).body("Invalid pdf");
@@ -103,5 +106,11 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Void> handleInternalException(Exception exc) {
         log.error(exc.getMessage(), exc);
         return status(INTERNAL_SERVER_ERROR).build();
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDataIntegrityViolationException(final DataIntegrityViolationException dve) {
+        log.error(dve.getMessage(), dve);
+        return status(CONFLICT).body("Duplicate request");
     }
 }
