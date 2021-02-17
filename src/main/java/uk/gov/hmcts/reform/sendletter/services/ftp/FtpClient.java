@@ -58,7 +58,7 @@ public class FtpClient {
 
     @Dependency(name = FTP_CLIENT, command = FTP_FILE_UPLOADED, type = FTP)
     public void upload(FileToSend file, String serviceFolder, SFTPClient sftpClient) {
-        logger.info("Uploading file {} to SFTP server", file.filename);
+        logger.info("Uploading file {} to SFTP server test", file.filename);
         String folder = file.isSmokeTest
             ? configProperties.getSmokeTestTargetFolder()
             : String.join("/", configProperties.getTargetFolder(), serviceFolder);
