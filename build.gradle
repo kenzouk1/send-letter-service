@@ -207,6 +207,11 @@ def versions = [
   pact_version: '4.1.7'
 ]
 
+ext {
+  set('springCloudVersion', "2020.0.1")
+}
+
+
 ext["rest-assured.version"] = '4.3.0'
 
 dependencyManagement {
@@ -234,6 +239,9 @@ dependencyManagement {
     //CVE-2019-14900
     dependencySet(group: 'org.hibernate', version: '5.4.27.Final') {
       entry 'hibernate-core'
+    }
+    imports {
+      mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
   }
 }
@@ -266,7 +274,7 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'pdf-generator', version: '1.0.2'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.1.0'
 
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-client', version: '2020.0.1'
+  implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.0'
 
